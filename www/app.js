@@ -428,30 +428,96 @@
     $('gps-utm').textContent = `Zona ${u.zone}${u.band} · E ${u.e.toFixed(2)} · N ${u.n.toFixed(2)}`;
     $('gps-status').textContent = 'GPS activo · coordenada recibida';
   }
-  function toggleGps(on) {
-    if (on) {
-      if (!navigator.geolocation) { $('gps-status').textContent = 'Geolocalización no disponible.'; $('gps-toggle').checked = false; return; }
-      $('gps-status').textContent = 'Solicitando permiso de ubicación...';
-      navigator.geolocation.getCurrentPosition(updateGpsUI, gpsError, { enableHighAccuracy:true, timeout:12000, maximumAge:0 });
-      state.gps.watchId = navigator.geolocation.watchPosition(updateGpsUI, gpsError, { enableHighAccuracy:true, timeout:12000, maximumAge:2000 });
-    } else {
-      if (state.gps.watchId != null) navigator.geolocation.clearWatch(state.gps.watchId);
-      state.gps.watchId = null;
-      $('gps-status').textContent = 'GPS desactivado';
+  async function toggleGps(on) {
+    try {
+      const nativeGeo = window.Capacitor?.Plugins?.Geolocation;
+      const isNative = window.Capacitor?.isNativePlatform?.();
+
+      if (on) {
+        $('gps-status').textContent = 'Solicitando permiso de ubicación...';
+
+        if (isNative && nativeGeo) {
+          let perm = await nativeGeo.checkPermissions().catch(() => null);
+
+          if (!perm || (perm.location !== 'granted' && perm.coarseLocation !== 'granted')) {
+            perm = await nativeGeo.requestPermissions({ permissions: ['location'] });
+          }
+
+          if (perm.location !== 'granted' && perm.coarseLocation !== 'granted') {
+            $('gps-status').textContent = 'Permiso de ubicación denegado.';
+            $('gps-toggle').checked = false;
+            return;
+          }
+
+          $('gps-status').textContent = 'Obteniendo coordenadas GPS...';
+
+          const pos = await nativeGeo.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+          });
+
+          updateGpsUI(pos);
+
+          state.gps.watchId = await nativeGeo.watchPosition(
+            {
+              enableHighAccuracy: true,
+              timeout: 15000,
+              maximumAge: 2000
+            },
+            function(position, err) {
+              if (err) {
+                gpsError(err);
+                return;
+              }
+              if (position) updateGpsUI(position);
+            }
+          );
+
+          state.gps.native = true;
+          return;
+        }
+
+        if (!navigator.geolocation) {
+          $('gps-status').textContent = 'Geolocalización no disponible.';
+          $('gps-toggle').checked = false;
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(updateGpsUI, gpsError, {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
+        });
+
+        state.gps.watchId = navigator.geolocation.watchPosition(updateGpsUI, gpsError, {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 2000
+        });
+
+        state.gps.native = false;
+      } else {
+        if (state.gps.native && nativeGeo && state.gps.watchId != null) {
+          await nativeGeo.clearWatch({ id: state.gps.watchId });
+        } else if (state.gps.watchId != null && navigator.geolocation) {
+          navigator.geolocation.clearWatch(state.gps.watchId);
+        }
+
+        state.gps.watchId = null;
+        state.gps.native = false;
+        $('gps-status').textContent = 'GPS desactivado';
+      }
+    } catch (err) {
+      gpsError(err);
+      $('gps-toggle').checked = false;
     }
   }
+
   function gpsError(err) {
-    $('gps-status').textContent = `GPS: ${err.message || 'no se pudo obtener ubicación'}`;
-    log(`GPS error: ${err.message}`);
-  }
-  function useGpsInForm() {
-    if (!Number.isFinite(state.gps.lat) || !Number.isFinite(state.gps.lon)) return toast('Primero activa el GPS');
-    const u = latLonToUTM(state.gps.lat, state.gps.lon);
-    $('f-zona').value = `${u.zone}${u.band}`;
-    $('f-este').value = u.e.toFixed(2);
-    $('f-norte').value = u.n.toFixed(2);
-    $('f-altitud').value = Number.isFinite(state.gps.alt) ? state.gps.alt.toFixed(2) : '';
-    toast('Coordenadas pasadas a ficha');
+    const msg = err?.message || err?.errorMessage || 'no se pudo obtener ubicación';
+    $('gps-status').textContent = `GPS: ${msg}`;
+    log(`GPS error: ${msg}`);
   }
   function openMaps() {
     if (!Number.isFinite(state.gps.lat) || !Number.isFinite(state.gps.lon)) return toast('Primero activa el GPS');
