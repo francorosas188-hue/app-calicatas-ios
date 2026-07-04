@@ -1,0 +1,54 @@
+workflows:
+  ios_ipa_sideloadly:
+    name: iOS IPA para Sideloadly
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    environment:
+      node: 20
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Instalar dependencias
+        script: |
+          npm install
+
+      - name: Crear carpeta iOS si no existe
+        script: |
+          npx cap add ios || true
+
+      - name: Sincronizar proyecto con iOS
+        script: |
+          npx cap sync ios
+
+      - name: Instalar CocoaPods
+        script: |
+          cd ios/App
+          pod install
+
+      - name: Compilar app iOS sin firma
+        script: |
+          cd ios/App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Crear archivo IPA
+        script: |
+          cd ios/App
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r AppCalicatas_UNSIGNED.ipa Payload
+
+    artifacts:
+      - ios/App/AppCalicatas_UNSIGNED.ipa
+      - ios/App/build/Build/Products/Release-iphoneos/*.app
