@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#005B97" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>InGe+ AppCalicatas</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png" />
+  <link rel="icon" href="assets/images/favicon-32.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <section id="auth-screen" class="screen auth-screen active" aria-label="Inicio de sesión">
+      <div class="auth-card">
+        <img class="auth-logo" src="assets/images/LOGO_APP.png" alt="InGe+" />
+        <div id="login-view" class="auth-view active">
+          <h1>Bienvenido</h1>
+          <p class="muted">Ingresa con el servidor madre o usa modo local para campo.</p>
+          <label>Correo electrónico<input id="login-email" type="email" autocomplete="email" placeholder="usuario@empresa.com" /></label>
+          <label>Contraseña<input id="login-password" type="password" autocomplete="current-password" placeholder="••••••••" /></label>
+          <button id="btn-login" class="primary">Iniciar sesión</button>
+          <button id="btn-local" class="secondary">Modo Local</button>
+          <button id="btn-show-register" class="ghost">Crear una Cuenta</button>
+          <p id="login-msg" class="message"></p>
+        </div>
+        <div id="register-view" class="auth-view">
+          <h1>Crear cuenta</h1>
+          <p class="muted">Registro compatible con Supabase Auth.</p>
+          <div class="two-cols compact">
+            <label>Nombre<input id="reg-nombre" type="text" placeholder="Nombre" /></label>
+            <label>Apellido<input id="reg-apellido" type="text" placeholder="Apellido" /></label>
+          </div>
+          <label>Correo electrónico<input id="reg-email" type="email" placeholder="correo@empresa.com" /></label>
+          <label>Teléfono<input id="reg-phone" inputmode="tel" placeholder="999 999 999" /></label>
+          <label>Contraseña<input id="reg-password" type="password" placeholder="8+ caracteres, mayúscula, minúscula y número" /></label>
+          <label>Confirmar contraseña<input id="reg-password2" type="password" placeholder="Repite la contraseña" /></label>
+          <button id="btn-register" class="primary">Registrarme</button>
+          <button id="btn-back-login" class="secondary">Volver a Iniciar</button>
+          <p id="register-msg" class="message"></p>
+        </div>
+        <small>© Imgema SAC · Migración iOS</small>
+      </div>
+    </section>
+
+    <section id="main-screen" class="screen main-screen" aria-label="InGe+ Mobile">
+      <header class="topbar">
+        <button id="btn-menu" class="icon-btn" aria-label="Opciones">☰</button>
+        <div class="topbar-title">
+          <strong id="header-title">Hola, Invitado</strong>
+          <span id="header-subtitle">¿Qué ficha quieres completar?</span>
+        </div>
+        <img class="top-logo" src="assets/images/LOGO_APP1.png" alt="Logo" />
+      </header>
+
+      <aside id="drawer" class="drawer" aria-hidden="true">
+        <div class="drawer-panel">
+          <div class="drawer-head">
+            <img src="assets/images/INGEMA_LOGO_COMPLETO.png" alt="Ingema" />
+            <button id="btn-close-drawer" class="icon-btn">✕</button>
+          </div>
+          <h3>Opciones</h3>
+          <p id="drawer-session" class="muted">Modo local</p>
+          <button id="btn-change-folder" class="drawer-item">Carpeta de proyectos: InGePlusProyectos</button>
+          <button id="btn-export-log" class="drawer-item">Exportar log</button>
+          <button id="btn-about" class="drawer-item">Acerca de</button>
+          <button id="btn-logout" class="danger">Cerrar sesión</button>
+        </div>
+      </aside>
+
+      <main id="content" class="content">
+        <section id="page-home" class="page active">
+          <div class="home-grid">
+            <button class="feature-card" data-open="calicata"><img src="assets/images/ICONO_CALICATA.jpeg" /><span>FICHA DE CALICATA</span></button>
+            <button class="feature-card" data-open="talud"><img src="assets/images/ICONO_TS.jpeg" /><span>FICHA DE TALUD</span></button>
+            <button class="feature-card" data-open="perfiles"><img src="assets/images/ICONO_PE.jpeg" /><span>PERFILES ESTRATIGRÁFICOS</span></button>
+            <button class="feature-card" data-open="eg"><img src="assets/images/ICONO_EG.jpeg" /><span>ESTACIONES GEOMECÁNICAS</span></button>
+            <button class="feature-card disabled"><img src="assets/images/excel.png" /><span>PENDIENTE</span></button>
+            <button class="feature-card disabled"><img src="assets/images/folder.png" /><span>PENDIENTE</span></button>
+            <button class="feature-card disabled"><img src="assets/images/map_gps.png" /><span>PENDIENTE</span></button>
+            <button class="feature-card disabled"><img src="assets/images/validate.png" /><span>PENDIENTE</span></button>
+          </div>
+        </section>
+
+        <section id="page-form" class="page">
+          <div class="page-actions sticky-actions">
+            <button id="btn-back-home" class="secondary">← Inicio</button>
+            <button id="btn-save-form" class="primary">Guardar ficha</button>
+            <button id="btn-export-excel" class="success">Exportar Excel</button>
+          </div>
+          <form id="calicata-form" class="form-card">
+            <div class="form-header-sheet">
+              <div class="logo-slot"><span>Subir Logo MTC</span><input id="logo-mtc" type="file" accept="image/*" /></div>
+              <div class="sheet-title">
+                <h2 id="form-title">FICHA DE CALICATA</h2>
+                <p>Formato móvil adaptado desde Qt/QML</p>
+              </div>
+              <div class="logo-slot"><span>Subir Logo Proyecto</span><input id="logo-proyecto" type="file" accept="image/*" /></div>
+            </div>
+            <div class="two-cols">
+              <label>Proyecto<input id="f-proyecto" name="proyecto" value="Proyecto Lechamayo" /></label>
+              <label>Calicata<input id="f-calicata" name="calicata" value="CAL-001" /></label>
+              <label>Supervisor<input id="f-supervisor" name="supervisor" placeholder="Supervisor" /></label>
+              <label>Máquina<input id="f-maquina" name="maquina" placeholder="Retroexcavadora / manual" /></label>
+              <label>Lado de Vía<select id="f-lado" name="lado"><option>Margen derecha</option><option>Margen izquierda</option><option>Eje</option><option>No aplica</option></select></label>
+              <label>Zona UTM<input id="f-zona" name="zona" value="18S" /></label>
+              <label>X UTM / Este<input id="f-este" name="este" inputmode="decimal" placeholder="E 000000.00" /></label>
+              <label>Y UTM / Norte<input id="f-norte" name="norte" inputmode="decimal" placeholder="N 0000000.00" /></label>
+              <label>Altitud<input id="f-altitud" name="altitud" inputmode="decimal" placeholder="m.s.n.m." /></label>
+              <label>Fecha Inicio<input id="f-fecha-inicio" name="fechaInicio" type="date" /></label>
+              <label>Fecha Fin<input id="f-fecha-fin" name="fechaFin" type="date" /></label>
+              <label>Hora<input id="f-hora" name="hora" type="time" /></label>
+            </div>
+            <label>Descripción del terreno<textarea id="f-descripcion" name="descripcion" rows="4" placeholder="Describir material, color, humedad, compacidad, presencia de agua, estabilidad de paredes..."></textarea></label>
+            <div class="section-title"><span>Cortes / estratos</span><button id="btn-add-corte" type="button" class="secondary">+ Agregar corte</button></div>
+            <div id="cortes-list" class="cortes-list"></div>
+            <div class="section-title"><span>Fotografías</span></div>
+            <div class="photo-grid">
+              <label class="photo-slot">Tocar para tomar foto<input type="file" accept="image/*" capture="environment" /></label>
+              <label class="photo-slot">Subir imagen<input type="file" accept="image/*" /></label>
+              <label class="photo-slot">Croquis / evidencia<input type="file" accept="image/*" /></label>
+            </div>
+            <label>Observaciones<textarea id="f-obs" name="observaciones" rows="3" placeholder="Observaciones generales de campo"></textarea></label>
+          </form>
+        </section>
+
+        <section id="page-docs" class="page">
+          <div class="docs-head">
+            <div><h2>Documentos</h2><p class="muted">Fichas guardadas localmente para campo.</p></div>
+            <button id="btn-new-doc" class="primary">Nueva calicata</button>
+          </div>
+          <div id="docs-list" class="docs-list"></div>
+        </section>
+
+        <section id="page-map" class="page">
+          <div class="diagnostic-card">
+            <h2>GPS / Internet</h2>
+            <p class="muted">Diagnóstico seguro para iOS/Capacitor</p>
+            <div class="map-visual"><div class="pin">⌖</div></div>
+            <div class="switch-row"><span>GPS del dispositivo</span><label class="switch"><input id="gps-toggle" type="checkbox" /><i></i></label></div>
+            <p id="gps-status" class="status">GPS desactivado</p>
+            <div class="coords-grid">
+              <span>Latitud</span><strong id="gps-lat">--</strong>
+              <span>Longitud</span><strong id="gps-lon">--</strong>
+              <span>Altitud</span><strong id="gps-alt">--</strong>
+              <span>Hora</span><strong id="gps-time">--</strong>
+              <span>UTM</span><strong id="gps-utm">--</strong>
+            </div>
+            <div class="page-actions">
+              <button id="btn-use-gps-form" class="secondary">Pasar coordenadas a ficha</button>
+              <button id="btn-open-maps" class="secondary">Abrir en mapas</button>
+            </div>
+          </div>
+          <div class="diagnostic-card">
+            <h3>Internet / servidores</h3>
+            <p id="internet-status">Internet: sin verificar</p>
+            <p id="server-status">Servidor: sin verificar</p>
+            <div class="page-actions">
+              <button id="btn-check-internet" class="secondary">Probar internet</button>
+              <button id="btn-check-server" class="secondary">Probar servidor</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-profile" class="page">
+          <div class="profile-card">
+            <div class="avatar" id="profile-initial">U</div>
+            <h2 id="profile-name">Usuario</h2>
+            <p id="profile-session" class="muted">Sesión no iniciada</p>
+            <div class="profile-info"><span>Correo</span><strong id="profile-email">--</strong></div>
+            <div class="profile-info"><span>Teléfono</span><strong id="profile-phone">--</strong></div>
+            <button id="btn-profile-login" class="primary">Ir a iniciar sesión</button>
+            <button id="btn-profile-logout" class="danger">Cerrar sesión</button>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Navegación principal">
+        <button class="nav-btn active" data-page="home"><img src="assets/images/home.png" /><span>Inicio</span></button>
+        <button class="nav-btn" data-page="map"><img src="assets/images/location.png" /><span>GPS</span></button>
+        <button class="nav-btn" data-page="docs"><img src="assets/images/description.png" /><span>Docs</span></button>
+        <button class="nav-btn" data-page="profile"><img src="assets/images/account_circle.png" /><span>Perfil</span></button>
+      </nav>
+      <div id="toast" class="toast"></div>
+    </section>
+  </div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

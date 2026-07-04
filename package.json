@@ -1,0 +1,26 @@
+{
+  "name": "app-calicatas-ingeplus-ios",
+  "version": "1.0.0-ios-migracion",
+  "description": "Migración híbrida iOS/Capacitor del proyecto Qt Creator AppCalicatasMobile / InGe+.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "npx http-server www -p 9000 -c-1",
+    "cap:add:ios": "npx cap add ios",
+    "cap:sync:ios": "npx cap sync ios",
+    "cap:open:ios": "npx cap open ios",
+    "cap:doctor": "npx cap doctor"
+  },
+  "dependencies": {
+    "@capacitor/app": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/haptics": "latest",
+    "@capacitor/ios": "latest",
+    "@capacitor/keyboard": "latest",
+    "@capacitor/status-bar": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "http-server": "latest"
+  }
+}
