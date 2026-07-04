@@ -135,11 +135,12 @@
           <div id="docs-list" class="docs-list"></div>
         </section>
 
-        <section id="page-map" class="page">
+       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> <section id="page-map" class="page">
           <div class="diagnostic-card">
             <h2>GPS / Internet</h2>
             <p class="muted">Diagnóstico seguro para iOS/Capacitor</p>
-            <div class="map-visual"><div class="pin">⌖</div></div>
+           <div id="gps-map" class="gps-map"></div>
             <div class="switch-row"><span>GPS del dispositivo</span><label class="switch"><input id="gps-toggle" type="checkbox" /><i></i></label></div>
             <p id="gps-status" class="status">GPS desactivado</p>
             <div class="coords-grid">
