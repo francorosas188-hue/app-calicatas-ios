@@ -21,6 +21,17 @@ workflows:
       - name: Sincronizar proyecto con iOS
         script: |
           npx cap sync ios
+                - name: Agregar permisos de ubicacion iOS
+        script: |
+          INFO_PLIST="ios/App/App/Info.plist"
+
+          /usr/libexec/PlistBuddy -c "Set :NSLocationWhenInUseUsageDescription 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST" || \
+          /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST"
+
+          /usr/libexec/PlistBuddy -c "Set :NSLocationAlwaysAndWhenInUseUsageDescription 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST" || \
+          /usr/libexec/PlistBuddy -c "Add :NSLocationAlwaysAndWhenInUseUsageDescription string 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST"
+
+          echo "Permisos de ubicacion agregados en Info.plist"
 
       - name: Revisar estructura iOS
         script: |
