@@ -427,6 +427,7 @@
     const u = latLonToUTM(lat, lon);
     $('gps-utm').textContent = `Zona ${u.zone}${u.band} · E ${u.e.toFixed(2)} · N ${u.n.toFixed(2)}`;
     $('gps-status').textContent = 'GPS activo · coordenada recibida';
+    updateMapUI(lat, lon);
   }
   async function toggleGps(on) {
     try {
@@ -458,6 +459,52 @@
           });
 
           updateGpsUI(pos);
+            let gpsMap = null;
+  let gpsMarker = null;
+
+  function initGpsMap(lat, lon) {
+    const mapEl = document.getElementById('gps-map');
+    if (!mapEl || typeof L === 'undefined') return;
+
+    gpsMap = L.map('gps-map', {
+      zoomControl: true,
+      attributionControl: true
+    }).setView([lat, lon], 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(gpsMap);
+
+    gpsMarker = L.marker([lat, lon]).addTo(gpsMap);
+    gpsMarker.bindPopup('Ubicación actual').openPopup();
+
+    setTimeout(() => {
+      gpsMap.invalidateSize();
+    }, 500);
+  }
+
+  function updateMapUI(lat, lon) {
+    const mapEl = document.getElementById('gps-map');
+    if (!mapEl || typeof L === 'undefined') return;
+
+    if (!gpsMap) {
+      initGpsMap(lat, lon);
+      return;
+    }
+
+    gpsMap.setView([lat, lon], 17);
+
+    if (gpsMarker) {
+      gpsMarker.setLatLng([lat, lon]);
+    } else {
+      gpsMarker = L.marker([lat, lon]).addTo(gpsMap);
+    }
+
+    setTimeout(() => {
+      gpsMap.invalidateSize();
+    }, 300);
+  }
 
           state.gps.watchId = await nativeGeo.watchPosition(
             {
