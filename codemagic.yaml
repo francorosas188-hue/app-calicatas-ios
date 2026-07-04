@@ -17,88 +17,19 @@ workflows:
       - name: Crear carpeta iOS si no existe
         script: |
           npx cap add ios || true
-        
+
       - name: Sincronizar proyecto con iOS
         script: |
           npx cap sync ios
-       
-         name: Agregar permisos de ubicacion iOS
+
+      - name: Agregar permisos de ubicacion iOS
         script: |
           INFO_PLIST="ios/App/App/Info.plist"
 
-          /usr/libexec/PlistBuddy -c "Set :NSLocationWhenInUseUsageDescription 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST" || \
-          /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST"
-
-          /usr/libexec/PlistBuddy -c "Set :NSLocationAlwaysAndWhenInUseUsageDescription 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST" || \
-          /usr/libexec/PlistBuddy -c "Add :NSLocationAlwaysAndWhenInUseUsageDescription string 'La app necesita acceder a tu ubicación para obtener coordenadas GPS y UTM en campo.'" "$INFO_PLIST"
-
-          echo "Permisos de ubicacion agregados en Info.plist"
-
-      - name: Revisar estructura iOS
-        script: |
-          echo "Contenido principal:"
-          ls -la
-          echo "Contenido ios:"
-          ls -la ios || true
-          echo "Contenido ios/App:"
-          ls -la ios/App || true
-
-      - name: Instalar CocoaPods solo si existe Podfile
-        script: |
-          cd ios/App
-          if [ -f "Podfile" ]; then
-            echo "Podfile encontrado. Ejecutando pod install..."
-            pod install
-          else
-            echo "No existe Podfile. Se omite pod install."
-          fi
-
-      - name: Compilar app iOS sin firma
-        script: |
-          cd ios/App
-
-          if [ -d "App.xcworkspace" ]; then
-            echo "Compilando con App.xcworkspace..."
-            xcodebuild \
-              -workspace App.xcworkspace \
-              -scheme App \
-              -configuration Release \
-              -sdk iphoneos \
-              -derivedDataPath build \
-              CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGN_IDENTITY="" \
-              build
-          else
-            echo "No hay workspace. Compilando con App.xcodeproj..."
-            xcodebuild \
-              -project App.xcodeproj \
-              -scheme App \
-              -configuration Release \
-              -sdk iphoneos \
-              -derivedDataPath build \
-              CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGN_IDENTITY="" \
-              build
-          fi
-
-      - name: Crear archivo IPA
-        script: |
-          cd ios/App
-          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
-
-          if [ -z "$APP_PATH" ]; then
-            echo "No se encontró archivo .app"
+          if [ ! -f "$INFO_PLIST" ]; then
+            echo "No se encontro Info.plist en $INFO_PLIST"
+            find ios -name "Info.plist" -print || true
             exit 1
           fi
 
-          echo "App encontrada en: $APP_PATH"
-          rm -rf Payload
-          mkdir -p Payload
-          cp -R "$APP_PATH" Payload/
-          zip -r AppCalicatas_UNSIGNED.ipa Payload
-
-    artifacts:
-      - ios/App/AppCalicatas_UNSIGNED.ipa
-      - ios/App/build/Build/Products/Release-iphoneos/*.app
+          /usr/libexec/PlistBuddy -c "Set :NSLocationWhenInUseUsageDescription La app necesita acceder a tu
