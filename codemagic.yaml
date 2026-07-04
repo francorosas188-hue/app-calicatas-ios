@@ -17,11 +17,12 @@ workflows:
       - name: Crear carpeta iOS si no existe
         script: |
           npx cap add ios || true
-
+        
       - name: Sincronizar proyecto con iOS
         script: |
           npx cap sync ios
-                - name: Agregar permisos de ubicacion iOS
+       
+         name: Agregar permisos de ubicacion iOS
         script: |
           INFO_PLIST="ios/App/App/Info.plist"
 
