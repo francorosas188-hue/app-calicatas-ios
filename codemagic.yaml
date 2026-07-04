@@ -22,29 +22,67 @@ workflows:
         script: |
           npx cap sync ios
 
-      - name: Instalar CocoaPods
+      - name: Revisar estructura iOS
+        script: |
+          echo "Contenido principal:"
+          ls -la
+          echo "Contenido ios:"
+          ls -la ios || true
+          echo "Contenido ios/App:"
+          ls -la ios/App || true
+
+      - name: Instalar CocoaPods solo si existe Podfile
         script: |
           cd ios/App
-          pod install
+          if [ -f "Podfile" ]; then
+            echo "Podfile encontrado. Ejecutando pod install..."
+            pod install
+          else
+            echo "No existe Podfile. Se omite pod install."
+          fi
 
       - name: Compilar app iOS sin firma
         script: |
           cd ios/App
-          xcodebuild \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build
+
+          if [ -d "App.xcworkspace" ]; then
+            echo "Compilando con App.xcworkspace..."
+            xcodebuild \
+              -workspace App.xcworkspace \
+              -scheme App \
+              -configuration Release \
+              -sdk iphoneos \
+              -derivedDataPath build \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY="" \
+              build
+          else
+            echo "No hay workspace. Compilando con App.xcodeproj..."
+            xcodebuild \
+              -project App.xcodeproj \
+              -scheme App \
+              -configuration Release \
+              -sdk iphoneos \
+              -derivedDataPath build \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY="" \
+              build
+          fi
 
       - name: Crear archivo IPA
         script: |
           cd ios/App
           APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
+
+          if [ -z "$APP_PATH" ]; then
+            echo "No se encontró archivo .app"
+            exit 1
+          fi
+
+          echo "App encontrada en: $APP_PATH"
+          rm -rf Payload
           mkdir -p Payload
           cp -R "$APP_PATH" Payload/
           zip -r AppCalicatas_UNSIGNED.ipa Payload
